@@ -27,5 +27,7 @@ public class CodeParserExecutor {
             default -> throw new BusinessException(ErrorCode.OPERATION_ERROR, "不支持的应用类型");
         };
     }
+
+
 }
 

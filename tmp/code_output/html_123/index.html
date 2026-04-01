@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人简历</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        header h1 {
+            margin: 10px 0;
+        }
+        header p {
+            font-style: italic;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .section ul li {
+            margin: 5px 0;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            header img {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="https://picsum.photos/150" alt="Profile Image">
+            <h1>张三</h1>
+            <p>Web 前端开发工程师</p>
+        </header>
+        <div class="section" id="about">
+            <h2>关于我</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Sed euismod, nisl id convallis facilisis, justo nisi varius nisl, eget faucibus nisl nisl vel nisl. Sed quis semper eros.</p>
+        </div>
+        <div class="section" id="skills">
+            <h2>技能</h2>
+            <ul>
+                <li>HTML/CSS</li>
+                <li>JavaScript</li>
+                <li>React.js</li>
+                <li>Node.js</li>
+                <li>Git</li>
+            </ul>
+        </div>
+        <div class="section" id="experience">
+            <h2>工作经验</h2>
+            <h3>Web 前端开发工程师 - ABC 公司</h3>
+            <p>2019年6月 - 至今</p>
+            <ul>
+                <li>负责公司网站的前端开发和维护</li>
+                <li>使用 React.js 构建用户界面</li>
+                <li>优化网站性能，提高用户体验</li>
+            </ul>
+            <h3>前端实习生 - XYZ 公司</h3>
+            <p>2018年3月 - 2019年5月</p>
+            <ul>
+                <li>协助团队完成前端开发任务</li>
+                <li>参与项目的需求分析和设计</li>
+            </ul>
+        </div>
+        <div class="section" id="education">
+            <h2>教育背景</h2>
+            <h3>XX 大学 - 计算机科学与技术</h3>
+            <p>2014年9月 - 2018年6月</p>
+            <ul>
+                <li>主修课程：数据结构、算法设计、计算机网络等</li>
+                <li>获得优秀毕业生称号</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
