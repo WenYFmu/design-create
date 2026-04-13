@@ -18,3 +18,6 @@ create table app
     INDEX idx_appName (appName),         -- 提升基于应用名称的查询性能
     INDEX idx_userId (userId)            -- 提升基于用户 ID 的查询性能
 ) comment '应用' collate = utf8mb4_unicode_ci;
+alter table app
+    add constraint app_pk
+        unique (deployKey);

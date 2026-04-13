@@ -4,6 +4,12 @@ import lombok.Data;
 
 @Data
 public class UpdateAppRequest {
+
+    /**
+     * 应用id
+     */
+    private Long id;
+
     /**
      * 应用名称
      */

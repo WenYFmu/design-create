@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class QueueAppRequest extends PageRequest implements Serializable {
 

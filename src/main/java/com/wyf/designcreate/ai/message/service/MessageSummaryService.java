@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
 * @author 15502
-* @description 针对表【message_summary(会话摘要表（与消息表分离存储）)】的数据库操作Service
+* @description 针对表【message_summary.sql(会话摘要表（与消息表分离存储）)】的数据库操作Service
 * @createDate 2026-04-06 14:40:04
 */
 public interface MessageSummaryService extends IService<MessageSummary> {
-
+    /**
+     * 获取最新摘要
+     */
+    MessageSummary queryLatestSummary(Long appId);
 }

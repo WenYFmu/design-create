@@ -3,7 +3,7 @@ package com.wyf.designcreate.ai.message.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wyf.designcreate.model.entity.MessageFeedback;
 import com.wyf.designcreate.ai.message.service.MessageFeedbackService;
-import com.wyf.designcreate.ai.message.mapper.MessageFeedbackMapper;
+import com.wyf.designcreate.mapper.MessageFeedbackMapper;
 import org.springframework.stereotype.Service;
 
 /**

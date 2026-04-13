@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 用户查询，分页
  */
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class UserQueryRequest extends PageRequest implements Serializable {
 

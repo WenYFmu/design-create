@@ -62,7 +62,7 @@ public class UserController {
         User loginUser = userService.getLoginUser(request);
         //未登录
         ThrowUtil.throwIf(loginUser == null, new BusinessException(ErrorCode.NOT_LOGIN));
-        ThrowUtil.throwIf(!loginUser.getId().equals(userUpdateRequest.getId()) || !userService.isAdmin(request), new BusinessException(ErrorCode.NO_AUTH));
+        ThrowUtil.throwIf(!loginUser.getId().equals(userUpdateRequest.getId()) && !userService.isAdmin(request), new BusinessException(ErrorCode.NO_AUTH));
         User user = new User();
         BeanUtil.copyProperties(userUpdateRequest, user);
         boolean res = userService.updateById(user);
@@ -70,7 +70,7 @@ public class UserController {
     }
 
     @PostMapping("/delete")
-    public Result<Boolean> deleteUser(@RequestBody Long id, HttpServletRequest request) {
+    public Result<Boolean> deleteUser(Long id, HttpServletRequest request) {
         ThrowUtil.throwIf(id == null || id < 1, new BusinessException(ErrorCode.PARAMS_ERROR));
         User loginUser = userService.getLoginUser(request);
         //未登录

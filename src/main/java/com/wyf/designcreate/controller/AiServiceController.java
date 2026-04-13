@@ -1,7 +1,8 @@
 package com.wyf.designcreate.controller;
 
 import cn.hutool.json.JSONUtil;
-import com.wyf.designcreate.ai.core.aiserver.codegen.AiCodeGeneratorService;
+import com.wyf.designcreate.ai.aiserver.codegen.AiCodeGeneratorService;
+import com.wyf.designcreate.annotation.myAuthCheck.Admin;
 import jakarta.annotation.Resource;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +20,9 @@ public class AiServiceController {
     private AiCodeGeneratorService aiCodeGeneratorService;
 
     @PostMapping("/stream")
+    @Admin
     public Flux<ServerSentEvent<String>> generateCode(String userMessage) {
-        Flux<String> stringFlux = aiCodeGeneratorService.generateHtmlCodeStream(userMessage);
+        Flux<String> stringFlux = aiCodeGeneratorService.generateHtmlCodeStream(11L,userMessage);
         // 发送SSE事件
         return stringFlux.map(check -> {
             Map<String, String> data = Map.of("d", check);

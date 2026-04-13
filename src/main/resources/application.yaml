@@ -1,16 +1,26 @@
 spring:
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
   datasource:
     # mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/design_create # 数据库名
+    url: jdbc:mysql://localhost:3306/design_create?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8
     username: root
     password: abc1128
     type: com.zaxxer.hikari.HikariDataSource
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 3600  # 1小时（秒），用于聊天记忆的TTL
   profiles:
     active: local
   servlet:
     multipart:
       max-file-size: 10MB
+  session:
+    timeout: 2592000
 server:
   port: 18080
   servlet:
@@ -56,5 +66,15 @@ knife4j:
     language: zh_cn
   #开启生产环境屏蔽
   production: false
-sa-token:
-  active-timeout: 43200
+#sa-token:
+#  active-timeout: 43200
+
+ai:
+  memory:
+    history-keep-turns: 4
+    summary-start-turns: 8
+    summary-enabled: true
+    summary-max-chars: 700
+    title-max-length: 30
+  summary:
+    system-prompt-path: classpath:prompt/app-message-summary-prompt.txt

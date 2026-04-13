@@ -1,6 +1,5 @@
 package com.wyf.designcreate.ai.model.enums;
 
-import lombok.Data;
 import lombok.Getter;
 
 /**

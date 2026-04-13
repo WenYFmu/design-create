@@ -168,6 +168,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return loginUser != null && UserRoleEnum.ADMIN.getValue().equals(loginUser.getUserRole());
     }
 
+    @Override
+    public boolean isAdmin(User loginUser) {
+        return loginUser != null && UserRoleEnum.ADMIN.getValue().equals(loginUser.getUserRole());
+    }
+
     private String getEncryptedPasswords(String password) {
         return DigestUtils.md5DigestAsHex((password + UserConstant.SALT).getBytes());
     }

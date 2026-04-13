@@ -4,13 +4,14 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.wyf.designcreate.ai.model.enums.CodeTypeEnum;
 import com.wyf.designcreate.common.ErrorCode;
+import com.wyf.designcreate.constant.AppConstant;
 import com.wyf.designcreate.exception.BusinessException;
 
 import java.io.File;
 
 public abstract class SaveCodeFileTemplate<T> {
     //file name
-    private final String FILE_SAVE_ROOT_DIR = System.getProperty("user.dir") + "/tmp/code_output";
+    private final String FILE_SAVE_ROOT_DIR = AppConstant.CODE_OUTPUT_ROOT_DIR;
 
     //处理对应类 <T>
     public void saveCodeFile(T result, Long appId) {
@@ -35,14 +36,16 @@ public abstract class SaveCodeFileTemplate<T> {
      * @param appId 应用id
      * @return 唯一路径
      */
-    protected String buildUniqueDir(Long appId) {
+    private String buildUniqueDir(Long appId) {
         if (appId == null) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "appId不存在");
         }
         String codeType = getCodeTypeEnum().getValue();
         String uniqueName = String.format("%s_%s", codeType, appId);
         String dirPath = FILE_SAVE_ROOT_DIR + File.separator + uniqueName;
-        FileUtil.mkdir(dirPath);
+        if(!FileUtil.exist(dirPath)){
+            FileUtil.mkdir(dirPath);
+        }
         return dirPath;
     }
 

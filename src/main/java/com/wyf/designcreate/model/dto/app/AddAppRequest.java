@@ -9,6 +9,10 @@ public class AddAppRequest {
      */
     private String appName;
 
+    /**
+     * 应用代码生成类型
+     */
+    private String codeGenType;
 
     /**
      * 初始化提示语

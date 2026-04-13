@@ -26,10 +26,25 @@
 		<tag/>
 		<url/>
 	</scm>
+
+	<repositories>
+		<repository>
+			<id>oss-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<properties>
 		<java.version>21</java.version>
+		<!-- 统一 LangChain4j 稳定版 -->
+		<langchain4j.version>1.12.2</langchain4j.version>
 	</properties>
+
 	<dependencies>
+		<!-- ==================== Spring Boot 基础依赖保持不变 ==================== -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -39,23 +54,69 @@
 			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
 
-		<!-- langchain -->
+		<!-- ==================== LangChain4j 统一版本改造 ==================== -->
+		<!-- 1. 核心包（传递依赖，但显式声明确保版本） -->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-core</artifactId>
+			<version>${langchain4j.version}</version>
+		</dependency>
+
+		<!-- 2. 主包（提供 AiServices、Tool 等核心 API） -->
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j</artifactId>
-			<version>1.3.0</version>
+			<version>${langchain4j.version}</version>
 		</dependency>
 
+		<!-- 3. OpenAI 集成（注意：Spring Boot Starter 在 1.12.2 中名称有变化） -->
+		<!-- 替换原来的 langchain4j-open-ai-spring-boot-starter -->
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-open-ai-spring-boot-starter</artifactId>
-			<version>1.3.0-beta9</version>
+			<version>${langchain4j.version}-beta22</version>
 		</dependency>
 
+		<!-- 4. Reactor 响应式支持（版本跟随主版本） -->
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-reactor</artifactId>
-			<version>1.3.0-beta9</version>
+			<version>${langchain4j.version}-beta22</version>
+		</dependency>
+
+		<!-- 5. Skills 模块（稳定版最高就是 beta22） -->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-skills</artifactId>
+			<version>${langchain4j.version}-beta22</version>
+		</dependency>
+
+		<!-- 6. Redis 社区集成（1.12.2 中有对应版本） -->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-community-redis-spring-boot-starter</artifactId>
+			<version>${langchain4j.version}-beta22</version>
+		</dependency>
+
+		<!-- ==================== 其他依赖保持不变 ==================== -->
+		<!-- Redisson -->
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson-spring-boot-starter</artifactId>
+			<version>3.27.0</version>
+		</dependency>
+
+		<!-- Spring Session + Redis -->
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-data-redis</artifactId>
+		</dependency>
+
+		<!-- 线程池 -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>transmittable-thread-local</artifactId>
+			<version>2.14.5</version>
 		</dependency>
 
 		<!-- hutool工具 -->
@@ -71,26 +132,27 @@
 			<artifactId>mybatis-plus-spring-boot3-starter</artifactId>
 			<version>3.5.12</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.baomidou</groupId>
 			<artifactId>mybatis-plus-jsqlparser</artifactId>
-			<version>3.5.12</version> <!-- 确保版本和 MyBatis Plus 主包一致，分页插件 -->
+			<version>3.5.12</version>
 		</dependency>
 
+		<!-- MySQL驱动 -->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!--	接口文档		-->
+		<!-- 接口文档 -->
 		<dependency>
 			<groupId>com.github.xiaoymin</groupId>
 			<artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
 			<version>4.5.0</version>
 		</dependency>
 
+		<!-- Lombok & Test 保持不变 -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

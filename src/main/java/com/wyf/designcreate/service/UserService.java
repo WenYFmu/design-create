@@ -52,4 +52,6 @@ public interface UserService extends IService<User> {
     UserVO getUserVO(User user);
 
     boolean isAdmin(HttpServletRequest request);
+
+    boolean isAdmin(User loginUser);
 }

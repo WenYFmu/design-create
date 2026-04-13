@@ -59,11 +59,11 @@ sa-token:
 langchain4j:
   open-ai:
     chat-model:
-      model-name: tongyi-xiaomi-analysis-pro
+      model-name: qwen3-max-2026-01-23
       api-key: sk-eb8c62d88ac44f828b22bf63d77b08f1
       base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
     streaming-chat-model:
-      model-name: tongyi-xiaomi-analysis-pro
+      model-name: qwen3-max-2026-01-23
       api-key: sk-eb8c62d88ac44f828b22bf63d77b08f1
       base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
 mycors:  http://localhost:5173 # 跨域配置

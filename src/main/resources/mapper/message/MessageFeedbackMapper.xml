@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.wyf.designcreate.ai.message.mapper.MessageFeedbackMapper">
+<mapper namespace="com.wyf.designcreate.mapper.MessageFeedbackMapper">
 
     <resultMap id="BaseResultMap" type="com.wyf.designcreate.model.entity.MessageFeedback">
             <id property="id" column="id" />
