@@ -10,6 +10,8 @@ public enum CodeTypeEnum {
     HTML("原生 HTML", "html"),
 
     MULTI_FILE("原生多文件模式", "multi_file"),
+
+    VUE("Vue项目", "vue"),
     ;
     private final String text;
 

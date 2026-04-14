@@ -1,4 +1,4 @@
-package com.wyf.designcreate.ai.aiserver.promptsum;
+package com.wyf.designcreate.ai.aiserver.title;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.service.AiServices;

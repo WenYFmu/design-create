@@ -2,9 +2,10 @@ package com.wyf.designcreate.ai.aiserver;
 
 import com.wyf.designcreate.ai.aiserver.codegen.AiCodeGeneratorService;
 import com.wyf.designcreate.ai.aiserver.codegen.AiCodeGeneratorServiceFactory;
-import com.wyf.designcreate.ai.aiserver.promptsum.AiPromptProcessService;
-import com.wyf.designcreate.ai.aiserver.promptsum.AiPromptProcessServiceFactory;
+import com.wyf.designcreate.ai.aiserver.title.AiPromptProcessService;
+import com.wyf.designcreate.ai.aiserver.title.AiPromptProcessServiceFactory;
 import com.wyf.designcreate.ai.core.handler.AiCodeGeneratorStreamHandler;
+import com.wyf.designcreate.ai.core.handler.TokenStreamHandler;
 import com.wyf.designcreate.ai.core.parser.CodeParserExecutor;
 import com.wyf.designcreate.ai.core.saver.SaveCodeFileTemplateExecutor;
 import com.wyf.designcreate.ai.model.HtmlResult;
@@ -12,7 +13,9 @@ import com.wyf.designcreate.ai.model.MultiFileResult;
 import com.wyf.designcreate.ai.model.enums.CodeTypeEnum;
 import com.wyf.designcreate.common.ErrorCode;
 import com.wyf.designcreate.exception.BusinessException;
+import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -37,7 +40,14 @@ public class AiServiceFacade {
     @Resource
     private AiPromptProcessServiceFactory aiPromptProcessServiceFactory;
 
-    /**
+    @Resource
+    private TokenStreamHandler tokenStreamHandler;
+
+    @Resource
+    @Qualifier("aiCodeGeneratorVueService")
+    private AiCodeGeneratorService aiCodeGeneratorVueService;
+
+        /**
      * 生成代码
      *
      * @param userMessage  用户消息
@@ -79,7 +89,10 @@ public class AiServiceFacade {
             case MULTI_FILE -> {
                 Flux<String> content = aiCodeGeneratorService.generateMultiFileCodeStream(appId, userMessage);
                 yield aiCodeGeneratorStreamHandler.streamHandleAsSave(content, codeTypeEnum, appId);
-
+            }
+            case VUE -> {
+                TokenStream tokenStream = aiCodeGeneratorVueService.generateVueCodeStream(appId, userMessage);
+                yield tokenStreamHandler.handleWithToolExecution(tokenStream);
             }
             default -> throw new BusinessException(ErrorCode.OPERATION_ERROR, "不支持的应用类型");
         };
