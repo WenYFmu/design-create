@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Create — AI 智能代码生成平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-deep:#0a0a0f;
+  --bg-primary:#0f1019;
+  --bg-secondary:#161825;
+  --bg-tertiary:#1c1f30;
+  --bg-elevated:#222640;
+  --border-subtle:rgba(0,240,255,0.06);
+  --border-default:rgba(0,240,255,0.12);
+  --border-strong:rgba(0,240,255,0.25);
+  --cyan:#00F0FF;
+  --cyan-dim:#00b8c5;
+  --cyan-glow:rgba(0,240,255,0.15);
+  --amber:#FFB800;
+  --amber-dim:#cc9300;
+  --amber-glow:rgba(255,184,0,0.12);
+  --violet:#a855f7;
+  --violet-glow:rgba(168,85,247,0.15);
+  --green:#22c55e;
+  --green-glow:rgba(34,197,94,0.12);
+  --red:#ef4444;
+  --text-primary:#e8eaf0;
+  --text-secondary:#8b8fa8;
+  --text-tertiary:#5c6080;
+  --text-accent:#00F0FF;
+  --font-display:'Outfit','Noto Sans SC',sans-serif;
+  --font-body:'Outfit','Noto Sans SC',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --radius-xl:20px;
+  --shadow-glow-cyan:0 0 20px rgba(0,240,255,0.1),0 0 60px rgba(0,240,255,0.05);
+  --shadow-glow-amber:0 0 20px rgba(255,184,0,0.1),0 0 60px rgba(255,184,0,0.05);
+  --transition-fast:0.15s cubic-bezier(0.4,0,0.2,1);
+  --transition-base:0.25s cubic-bezier(0.4,0,0.2,1);
+  --transition-slow:0.4s cubic-bezier(0.4,0,0.2,1);
+}
+html{font-size:14px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:var(--font-body);background:var(--bg-deep);color:var(--text-primary);overflow:hidden;height:100vh;width:100vw}
+
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse-glow{0%,100%{opacity:0.6}50%{opacity:1}}
+@keyframes typing-dot{0%,60%,100%{opacity:0.3;transform:scale(0.8)}30%{opacity:1;transform:scale(1)}}
+@keyframes stream-line{from{width:0}to{width:100%}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes borderGlow{0%,100%{border-color:rgba(0,240,255,0.15)}50%{border-color:rgba(0,240,255,0.35)}}
+@keyframes rotateOrb{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.app-layout{display:flex;height:100vh;width:100vw;position:relative;overflow:hidden}
+
+.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-orbs .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.3;animation:rotateOrb 60s linear infinite}
+.bg-orbs .orb-1{width:500px;height:500px;background:radial-gradient(circle,rgba(0,240,255,0.12),transparent 70%);top:-10%;left:-5%;animation-duration:80s}
+.bg-orbs .orb-2{width:400px;height:400px;background:radial-gradient(circle,rgba(168,85,247,0.1),transparent 70%);bottom:-10%;right:-5%;animation-duration:100s;animation-direction:reverse}
+.bg-orbs .orb-3{width:300px;height:300px;background:radial-gradient(circle,rgba(255,184,0,0.08),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:120s}
+
+.sidebar{width:280px;min-width:280px;background:var(--bg-primary);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;position:relative;z-index:10;animation:slideInLeft 0.5s ease both}
+.sidebar::after{content:'';position:absolute;right:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--cyan),transparent);opacity:0.15}
+
+.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border-subtle)}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.brand-icon{width:40px;height:40px;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--cyan),var(--violet));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--bg-deep);box-shadow:var(--shadow-glow-cyan)}
+.brand-text{font-family:var(--font-display);font-size:18px;font-weight:700;letter-spacing:-0.02em;background:linear-gradient(135deg,var(--text-primary),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand-sub{font-size:11px;color:var(--text-tertiary);letter-spacing:0.04em;text-transform:uppercase}
+
+.new-chat-btn{width:100%;padding:10px 16px;border:1px dashed var(--border-strong);border-radius:var(--radius-md);background:transparent;color:var(--cyan);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:var(--transition-base);position:relative;overflow:hidden}
+.new-chat-btn::before{content:'';position:absolute;inset:0;background:var(--cyan-glow);opacity:0;transition:var(--transition-base)}
+.new-chat-btn:hover::before{opacity:1}
+.new-chat-btn:hover{border-color:var(--cyan);box-shadow:var(--shadow-glow-cyan)}
+.new-chat-btn svg{width:16px;height:16px;flex-shrink:0}
+
+.sidebar-nav{flex:1;overflow-y:auto;padding:12px 12px;scrollbar-width:thin;scrollbar-color:var(--bg-elevated) transparent}
+.sidebar-nav::-webkit-scrollbar{width:4px}
+.sidebar-nav::-webkit-scrollbar-track{background:transparent}
+.sidebar-nav::-webkit-scrollbar-thumb{background:var(--bg-elevated);border-radius:4px}
+
+.nav-section{margin-bottom:20px}
+.nav-section-title{font-size:10px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.1em;padding:0 8px 8px;display:flex;align-items:center;gap:6px}
+.nav-section-title::after{content:'';flex:1;height:1px;background:var(--border-subtle)}
+
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition-fast);position:relative;margin-bottom:2px}
+.nav-item:hover{background:rgba(0,240,255,0.04)}
+.nav-item.active{background:rgba(0,240,255,0.08)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--cyan);border-radius:0 3px 3px 0;box-shadow:0 0 8px var(--cyan)}
+.nav-item-icon{width:18px;height:18px;color:var(--text-tertiary);flex-shrink:0;transition:var(--transition-fast)}
+.nav-item.active .nav-item-icon{color:var(--cyan)}
+.nav-item-text{font-size:13px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.nav-item.active .nav-item-text{color:var(--text-primary);font-weight:500}
+.nav-item-badge{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--cyan-glow);color:var(--cyan);font-weight:600}
+
+.sidebar-footer{padding:16px 16px;border-top:1px solid var(--border-subtle)}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-md);cursor:pointer;transition:var(--transition-fast)}
+.user-card:hover{background:rgba(0,240,255,0.04)}
+.user-avatar{width:34px;height:34px;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--amber),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--bg-deep)}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:var(--text-tertiary)}
+
+.main-area{flex:1;display:flex;flex-direction:column;position:relative;z-index:5;min-width:0}
+
+.top-bar{height:56px;min-height:56px;background:rgba(15,16,25,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:20}
+.top-bar-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.app-title{font-size:15px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);padding:3px 10px;border-radius:20px;background:var(--green-glow)}
+.app-status .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-glow 2s ease infinite}
+
+.mode-tabs{display:flex;align-items:center;gap:2px;background:var(--bg-secondary);border-radius:var(--radius-sm);padding:3px}
+.mode-tab{padding:6px 14px;border-radius:4px;font-size:12px;font-weight:500;color:var(--text-tertiary);cursor:pointer;transition:var(--transition-fast);white-space:nowrap}
+.mode-tab:hover{color:var(--text-secondary)}
+.mode-tab.active{background:var(--bg-elevated);color:var(--cyan);box-shadow:0 0 12px rgba(0,240,255,0.08)}
+
+.top-bar-right{display:flex;align-items:center;gap:8px}
+.icon-btn{width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:transparent;color:var(--text-tertiary);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition-fast)}
+.icon-btn:hover{border-color:var(--border-default);color:var(--text-secondary);background:var(--bg-secondary)}
+.icon-btn svg{width:16px;height:16px}
+.deploy-btn{padding:7px 16px;border-radius:var(--radius-sm);border:1px solid var(--amber-dim);background:var(--amber-glow);color:var(--amber);font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:var(--transition-base)}
+.deploy-btn:hover{background:rgba(255,184,0,0.2);border-color:var(--amber);box-shadow:var(--shadow-glow-amber)}
+.deploy-btn svg{width:14px;height:14px}
+
+.content-area{flex:1;display:flex;overflow:hidden;position:relative}
+
+.chat-panel{flex:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--border-subtle)}
+
+.chat-messages{flex:1;overflow-y:auto;padding:24px;scrollbar-width:thin;scrollbar-color:var(--bg-elevated) transparent}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-track{background:transparent}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--bg-elevated);border-radius:4px}
+
+.message{display:flex;gap:12px;margin-bottom:24px;animation:fadeInUp 0.4s ease both}
+.message.user{flex-direction:row-reverse}
+.message-avatar{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.message.ai .message-avatar{background:linear-gradient(135deg,var(--cyan),var(--violet));color:var(--bg-deep)}
+.message.user .message-avatar{background:linear-gradient(135deg,var(--amber),#ff8c00);color:var(--bg-deep)}
+.message-content{max-width:75%;min-width:0}
+.message.user .message-content{display:flex;flex-direction:column;align-items:flex-end}
+.message-bubble{padding:12px 16px;border-radius:var(--radius-lg);font-size:13.5px;line-height:1.7}
+.message.ai .message-bubble{background:var(--bg-secondary);border:1px solid var(--border-subtle);color:var(--text-primary);border-top-left-radius:4px}
+.message.user .message-bubble{background:linear-gradient(135deg,rgba(0,240,255,0.12),rgba(168,85,247,0.08));border:1px solid var(--border-default);color:var(--text-primary);border-top-right-radius:4px}
+
+.code-block{margin:12px 0;border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border-default);background:var(--bg-deep)}
+.code-block-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--bg-secondary);border-bottom:1px solid var(--border-subtle)}
+.code-block-lang{font-size:11px;font-weight:600;color:var(--cyan);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.05em}
+.code-block-copy{font-size:11px;color:var(--text-tertiary);cursor:pointer;padding:3px 8px;border-radius:4px;border:1px solid var(--border-subtle);background:transparent;font-family:var(--font-body);transition:var(--transition-fast)}
+.code-block-copy:hover{color:var(--cyan);border-color:var(--border-default)}
+.code-block-body{padding:14px;overflow-x:auto;font-family:var(--font-mono);font-size:12px;line-height:1.8;color:var(--text-secondary)}
+.code-block-body .keyword{color:var(--violet)}
+.code-block-body .string{color:var(--green)}
+.code-block-body .tag{color:var(--cyan)}
+.code-block-body .attr{color:var(--amber)}
+.code-block-body .comment{color:var(--text-tertiary);font-style:italic}
+
+.typing-indicator{display:flex;gap:4px;padding:4px 0}
+.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:typing-dot 1.4s ease infinite}
+.typing-indicator span:nth-child(2){animation-delay:0.2s}
+.typing-indicator span:nth-child(3){animation-delay:0.4s}
+
+.chat-input-area{padding:16px 24px 20px;border-top:1px solid var(--border-subtle);background:rgba(15,16,25,0.6);backdrop-filter:blur(10px)}
+.chat-input-wrapper{display:flex;align-items:flex-end;gap:10px;background:var(--bg-secondary);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:6px;transition:var(--transition-base)}
+.chat-input-wrapper:focus-within{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-glow),var(--shadow-glow-cyan)}
+.chat-input{flex:1;border:none;background:transparent;color:var(--text-primary);font-family:var(--font-body);font-size:13.5px;padding:8px 12px;resize:none;outline:none;min-height:40px;max-height:120px;line-height:1.5}
+.chat-input::placeholder{color:var(--text-tertiary)}
+.input-actions{display:flex;align-items:center;gap:4px;padding-right:4px}
+.input-action-btn{width:32px;height:32px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text-tertiary);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition-fast)}
+.input-action-btn:hover{color:var(--text-secondary);background:var(--bg-tertiary)}
+.input-action-btn svg{width:16px;height:16px}
+.send-btn{width:36px;height:36px;border-radius:var(--radius-sm);border:none;background:var(--cyan);color:var(--bg-deep);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition-base);flex-shrink:0}
+.send-btn:hover{background:#33f5ff;box-shadow:var(--shadow-glow-cyan)}
+.send-btn svg{width:16px;height:16px}
+.chat-input-hint{display:flex;align-items:center;justify-content:space-between;padding:6px 4px 0;font-size:11px;color:var(--text-tertiary)}
+.chat-input-hint kbd{padding:1px 5px;border-radius:3px;background:var(--bg-tertiary);border:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:10px}
+
+.preview-panel{width:50%;min-width:400px;display:flex;flex-direction:column;background:var(--bg-primary);animation:slideInRight 0.5s ease both}
+.preview-panel::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--cyan),transparent);opacity:0.08;z-index:1}
+
+.preview-tabs{display:flex;align-items:center;height:42px;min-height:42px;border-bottom:1px solid var(--border-subtle);background:rgba(15,16,25,0.5);padding:0 16px;gap:2px}
+.preview-tab{padding:6px 14px;font-size:12px;font-weight:500;color:var(--text-tertiary);cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition-fast);display:flex;align-items:center;gap:6px}
+.preview-tab:hover{color:var(--text-secondary)}
+.preview-tab.active{color:var(--cyan);background:rgba(0,240,255,0.06)}
+.preview-tab svg{width:14px;height:14px}
+.preview-tab .dot-indicator{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-glow 2s ease infinite}
+
+.preview-content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+.code-editor{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.code-editor-header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--bg-secondary);border-bottom:1px solid var(--border-subtle)}
+.file-tabs{display:flex;gap:2px}
+.file-tab{padding:5px 12px;font-size:11px;font-family:var(--font-mono);color:var(--text-tertiary);border-radius:4px;cursor:pointer;transition:var(--transition-fast);display:flex;align-items:center;gap:6px}
+.file-tab:hover{color:var(--text-secondary);background:var(--bg-tertiary)}
+.file-tab.active{color:var(--text-primary);background:var(--bg-elevated)}
+.file-tab .file-dot{width:6px;height:6px;border-radius:50%}
+.file-tab .file-dot.html{background:#e44d26}
+.file-tab .file-dot.css{background:#264de4}
+.file-tab .file-dot.js{background:#f0db4f}
+.code-editor-actions{display:flex;gap:4px}
+.code-editor-action{padding:4px 10px;font-size:11px;border-radius:4px;border:1px solid var(--border-subtle);background:transparent;color:var(--text-tertiary);cursor:pointer;font-family:var(--font-body);transition:var(--transition-fast);display:flex;align-items:center;gap:4px}
+.code-editor-action:hover{border-color:var(--border-default);color:var(--text-secondary)}
+.code-editor-action.primary{border-color:var(--cyan-dim);color:var(--cyan);background:var(--cyan-glow)}
+.code-editor-action.primary:hover{border-color:var(--cyan);background:rgba(0,240,255,0.2)}
+
+.code-body{flex:1;overflow:auto;padding:16px;font-family:var(--font-mono);font-size:12px;line-height:1.9;background:var(--bg-deep);scrollbar-width:thin;scrollbar-color:var(--bg-elevated) transparent}
+.code-body::-webkit-scrollbar{width:4px}
+.code-body::-webkit-scrollbar-track{background:transparent}
+.code-body::-webkit-scrollbar-thumb{background:var(--bg-elevated);border-radius:4px}
+.code-line{display:flex;gap:16px}
+.code-line-num{color:var(--text-tertiary);min-width:30px;text-align:right;user-select:none;opacity:0.5}
+.code-line-content{color:var(--text-secondary);white-space:pre}
+
+.preview-iframe-wrapper{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.preview-iframe-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--bg-secondary);border-bottom:1px solid var(--border-subtle)}
+.preview-url-bar{display:flex;align-items:center;gap:8px;padding:5px 12px;background:var(--bg-deep);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);flex:1;max-width:400px}
+.preview-url-bar svg{width:12px;height:12px;color:var(--green);flex-shrink:0}
+.preview-url-text{font-size:11px;font-family:var(--font-mono);color:var(--text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preview-iframe{flex:1;border:none;background:#fff;border-radius:0}
+
+.stream-indicator{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--cyan-glow);border:1px solid rgba(0,240,255,0.2);border-radius:var(--radius-md);margin:12px 0;font-size:12px;color:var(--cyan);animation:borderGlow 2s ease infinite}
+.stream-indicator .stream-dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);animation:pulse-glow 1s ease infinite}
+.stream-indicator .stream-bar{flex:1;height:2px;background:var(--bg-tertiary);border-radius:2px;overflow:hidden;max-width:200px}
+.stream-indicator .stream-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:2px;animation:stream-line 3s ease infinite}
+
+.welcome-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;animation:fadeIn 0.6s ease}
+.welcome-logo{width:80px;height:80px;border-radius:var(--radius-xl);background:linear-gradient(135deg,var(--cyan),var(--violet));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:var(--bg-deep);margin-bottom:24px;box-shadow:var(--shadow-glow-cyan);animation:float 4s ease infinite}
+.welcome-title{font-family:var(--font-display);font-size:28px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,var(--text-primary),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.welcome-sub{font-size:14px;color:var(--text-tertiary);margin-bottom:32px;max-width:400px;line-height:1.6}
+.welcome-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:600px;width:100%}
+.welcome-card{padding:16px;border-radius:var(--radius-md);border:1px solid var(--border-subtle);background:var(--bg-secondary);cursor:pointer;transition:var(--transition-base);text-align:left}
+.welcome-card:hover{border-color:var(--border-default);background:var(--bg-tertiary);transform:translateY(-2px)}
+.welcome-card-icon{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px}
+.welcome-card-icon.html{background:rgba(228,77,38,0.15);color:#e44d26}
+.welcome-card-icon.vue{background:var(--green-glow);color:var(--green)}
+.welcome-card-icon.slidev{background:var(--violet-glow);color:var(--violet)}
+.welcome-card-title{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px}
+.welcome-card-desc{font-size:11px;color:var(--text-tertiary);line-height:1.5}
+
+.resize-handle{width:4px;cursor:col-resize;background:var(--border-subtle);transition:var(--transition-fast);position:relative;z-index:15}
+.resize-handle:hover{background:var(--cyan);box-shadow:0 0 10px var(--cyan-glow)}
+
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border-default);color:var(--text-primary);font-size:13px;display:flex;align-items:center;gap:8px;z-index:100;animation:fadeInUp 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.toast .toast-icon{color:var(--green)}
+
+@media(max-width:1024px){
+  .sidebar{width:60px;min-width:60px}
+  .sidebar .brand-text,.sidebar .brand-sub,.sidebar .nav-item-text,.sidebar .nav-section-title,.sidebar .new-chat-btn span,.sidebar .user-info{display:none}
+  .sidebar .new-chat-btn{justify-content:center;padding:10px}
+  .preview-panel{min-width:300px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <div class="brand-icon">DC</div>
+        <div>
+          <div class="brand-text">Design Create</div>
+          <div class="brand-sub">AI Code Forge</div>
+        </div>
+      </div>
+      <button class="new-chat-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>新建对话</span>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">最近对话</div>
+        <div class="nav-item active">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="nav-item-text">电商落地页设计</span>
+          <span class="nav-item-badge">HTML</span>
+        </div>
+        <div class="nav-item">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="nav-item-text">任务管理看板</span>
+          <span class="nav-item-badge" style="background:var(--green-glow);color:var(--green)">Vue</span>
+        </div>
+        <div class="nav-item">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="nav-item-text">Q3产品路线图演示</span>
+          <span class="nav-item-badge" style="background:var(--violet-glow);color:var(--violet)">Slidev</span>
+        </div>
+        <div class="nav-item">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="nav-item-text">个人博客首页</span>
+          <span class="nav-item-badge">HTML</span>
+        </div>
+        <div class="nav-item">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="nav-item-text">数据可视化仪表盘</span>
+          <span class="nav-item-badge" style="background:var(--green-glow);color:var(--green)">Vue</span>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">已部署应用</div>
+        <div class="nav-item">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <span class="nav-item-text">shop-landing</span>
+        </div>
+        <div class="nav-item">
+          <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <span class="nav-item-text">task-board</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">WY</div>
+        <div class="user-info">
+          <div class="user-name">WenYF</div>
+          <div class="user-role">管理员</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <div class="app-title">电商落地页设计</div>
+        <div class="app-status">
+          <span class="dot"></span>
+          流式生成中
+        </div>
+      </div>
+      <div class="mode-tabs">
+        <div class="mode-tab active">HTML</div>
+        <div class="mode-tab">多文件</div>
+        <div class="mode-tab">Vue</div>
+        <div class="mode-tab">Slidev</div>
+      </div>
+      <div class="top-bar-right">
+        <button class="icon-btn" title="历史记录">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button class="icon-btn" title="分享">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </button>
+        <button class="deploy-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          部署上线
+        </button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="chat-panel">
+        <div class="chat-messages">
+
+          <div class="message user" style="animation-delay:0.1s">
+            <div class="message-avatar">WY</div>
+            <div class="message-content">
+              <div class="message-bubble">帮我设计一个现代风格的电商落地页，要求有产品展示区、特性介绍、用户评价和CTA按钮，配色偏暗色调科技感</div>
+            </div>
+          </div>
+
+          <div class="message ai" style="animation-delay:0.3s">
+            <div class="message-avatar">AI</div>
+            <div class="message-content">
+              <div class="message-bubble">
+                好的，我来为你设计一个暗色调科技风格的电商落地页。包含以下模块：
+                <br><br>
+                🎯 <strong>Hero区域</strong> — 全屏渐变背景 + 产品3D展示 + CTA按钮<br>
+                ⚡ <strong>特性介绍</strong> — 四宫格卡片布局，带图标和微动画<br>
+                🛍️ <strong>产品展示</strong> — 网格布局，悬停放大效果<br>
+                💬 <strong>用户评价</strong> — 轮播卡片，带头像和评分<br>
+                🚀 <strong>底部CTA</strong> — 渐变背景 + 行动号召
+                <br><br>
+                正在生成代码...
+              </div>
+            </div>
+          </div>
+
+          <div class="stream-indicator" style="animation-delay:0.5s">
+            <span class="stream-dot"></span>
+            <span>AI 正在流式生成代码</span>
+            <div class="stream-bar"><div class="stream-bar-fill"></div></div>
+          </div>
+
+          <div class="message ai" style="animation-delay:0.7s">
+            <div class="message-avatar">AI</div>
+            <div class="message-content">
+              <div class="message-bubble">
+                代码已生成完毕，以下是完整的 HTML 页面结构：
+                <div class="code-block">
+                  <div class="code-block-header">
+                    <span class="code-block-lang">html</span>
+                    <button class="code-block-copy">复制代码</button>
+                  </div>
+                  <div class="code-block-body"><span class="tag">&lt;!DOCTYPE html&gt;</span>
+<span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"zh-CN"</span><span class="tag">&gt;</span>
+<span class="tag">&lt;head&gt;</span>
+  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;title&gt;</span>NovaTech — 重新定义未来<span class="tag">&lt;/title&gt;</span>
+  <span class="tag">&lt;style&gt;</span>
+    <span class="keyword">*</span> { <span class="attr">margin</span>: <span class="string">0</span>; <span class="attr">padding</span>: <span class="string">0</span>; }
+    <span class="keyword">.hero</span> {
+      <span class="attr">background</span>: <span class="string">linear-gradient(135deg, #0a0a1a, #1a1a3e)</span>;
+      <span class="attr">min-height</span>: <span class="string">100vh</span>;
+    }
+  <span class="tag">&lt;/style&gt;</span>
+<span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;body&gt;</span>
+  <span class="comment">&lt;!-- Hero Section --&gt;</span>
+  <span class="tag">&lt;section</span> <span class="attr">class</span>=<span class="string">"hero"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/section&gt;</span>
+<span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></div>
+                </div>
+                <div style="margin-top:8px;font-size:12px;color:var(--text-tertiary)">
+                  ✅ 生成 1 个文件 · 共 186 行代码 · 右侧可预览效果
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="chat-input-area">
+          <div class="chat-input-wrapper">
+            <textarea class="chat-input" rows="1" placeholder="描述你想要生成的页面，AI 将为你实时编写代码..."></textarea>
+            <div class="input-actions">
+              <button class="input-action-btn" title="上传文件">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              </button>
+              <button class="input-action-btn" title="语音输入">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              </button>
+            </div>
+            <button class="send-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="chat-input-hint">
+            <span><kbd>Enter</kbd> 发送 · <kbd>Shift+Enter</kbd> 换行</span>
+            <span>HTML 模式</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="resize-handle"></div>
+
+      <div class="preview-panel">
+        <div class="preview-tabs">
+          <div class="preview-tab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            代码
+          </div>
+          <div class="preview-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            预览
+            <span class="dot-indicator"></span>
+          </div>
+          <div class="preview-tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            结构
+          </div>
+        </div>
+
+        <div class="preview-content">
+          <div class="code-editor">
+            <div class="code-editor-header">
+              <div class="file-tabs">
+                <div class="file-tab active">
+                  <span class="file-dot html"></span>
+                  index.html
+                </div>
+                <div class="file-tab">
+                  <span class="file-dot css"></span>
+                  style.css
+                </div>
+                <div class="file-tab">
+                  <span class="file-dot js"></span>
+                  script.js
+                </div>
+              </div>
+              <div class="code-editor-actions">
+                <button class="code-editor-action">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                  复制
+                </button>
+                <button class="code-editor-action">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  下载
+                </button>
+                <button class="code-editor-action primary">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                  部署
+                </button>
+              </div>
+            </div>
+            <div class="code-body">
+              <div class="code-line"><span class="code-line-num">1</span><span class="code-line-content"><span class="tag">&lt;!DOCTYPE html&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">2</span><span class="code-line-content"><span class="tag">&lt;html</span> <span class="attr">lang</span>=<span class="string">"zh-CN"</span><span class="tag">&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">3</span><span class="code-line-content"><span class="tag">&lt;head&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">4</span><span class="code-line-content">  <span class="tag">&lt;meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span><span class="tag">&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">5</span><span class="code-line-content">  <span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"viewport"</span> <span class="attr">content</span>=<span class="string">"width=device-width, initial-scale=1.0"</span><span class="tag">&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">6</span><span class="code-line-content">  <span class="tag">&lt;title&gt;</span>NovaTech — 重新定义未来<span class="tag">&lt;/title&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">7</span><span class="code-line-content">  <span class="tag">&lt;link</span> <span class="attr">href</span>=<span class="string">"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span><span class="tag">&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">8</span><span class="code-line-content">  <span class="tag">&lt;style&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">9</span><span class="code-line-content">    <span class="keyword">*</span> { <span class="attr">margin</span>: <span class="string">0</span>; <span class="attr">padding</span>: <span class="string">0</span>; <span class="attr">box-sizing</span>: <span class="string">border-box</span>; }</span></div>
+              <div class="code-line"><span class="code-line-num">10</span><span class="code-line-content">    <span class="keyword">:root</span> {</span></div>
+              <div class="code-line"><span class="code-line-num">11</span><span class="code-line-content">      <span class="attr">--bg</span>: <span class="string">#0a0a1a</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">12</span><span class="code-line-content">      <span class="attr">--accent</span>: <span class="string">#00f0ff</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">13</span><span class="code-line-content">      <span class="attr">--text</span>: <span class="string">#e8eaf0</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">14</span><span class="code-line-content">    }</span></div>
+              <div class="code-line"><span class="code-line-num">15</span><span class="code-line-content">    <span class="keyword">body</span> { <span class="attr">font-family</span>: <span class="string">'Inter', sans-serif</span>; <span class="attr">background</span>: <span class="string">var(--bg)</span>; <span class="attr">color</span>: <span class="string">var(--text)</span>; }</span></div>
+              <div class="code-line"><span class="code-line-num">16</span><span class="code-line-content">    <span class="keyword">.hero</span> {</span></div>
+              <div class="code-line"><span class="code-line-num">17</span><span class="code-line-content">      <span class="attr">min-height</span>: <span class="string">100vh</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">18</span><span class="code-line-content">      <span class="attr">background</span>: <span class="string">linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0f1a2e 100%)</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">19</span><span class="code-line-content">      <span class="attr">display</span>: <span class="string">flex</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">20</span><span class="code-line-content">      <span class="attr">align-items</span>: <span class="string">center</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">21</span><span class="code-line-content">      <span class="attr">justify-content</span>: <span class="string">center</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">22</span><span class="code-line-content">    }</span></div>
+              <div class="code-line"><span class="code-line-num">23</span><span class="code-line-content">    <span class="keyword">.hero-title</span> {</span></div>
+              <div class="code-line"><span class="code-line-num">24</span><span class="code-line-content">      <span class="attr">font-size</span>: <span class="string">4rem</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">25</span><span class="code-line-content">      <span class="attr">font-weight</span>: <span class="string">800</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">26</span><span class="code-line-content">      <span class="attr">background</span>: <span class="string">linear-gradient(135deg, #fff, var(--accent))</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">27</span><span class="code-line-content">      <span class="attr">-webkit-background-clip</span>: <span class="string">text</span>;</span></div>
+              <div class="code-line"><span class="code-line-num">28</span><span class="code-line-content">    }</span></div>
+              <div class="code-line"><span class="code-line-num">29</span><span class="code-line-content">  <span class="tag">&lt;/style&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">30</span><span class="code-line-content"><span class="tag">&lt;/head&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">31</span><span class="code-line-content"><span class="tag">&lt;body&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">32</span><span class="code-line-content">  <span class="comment">&lt;!-- Hero Section --&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">33</span><span class="code-line-content">  <span class="tag">&lt;section</span> <span class="attr">class</span>=<span class="string">"hero"</span><span class="tag">&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">34</span><span class="code-line-content">    <span class="tag">&lt;h1</span> <span class="attr">class</span>=<span class="string">"hero-title"</span><span class="tag">&gt;</span>NovaTech<span class="tag">&lt;/h1&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">35</span><span class="code-line-content">  <span class="tag">&lt;/section&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">36</span><span class="code-line-content"><span class="tag">&lt;/body&gt;</span></span></div>
+              <div class="code-line"><span class="code-line-num">37</span><span class="code-line-content"><span class="tag">&lt;/html&gt;</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast">
+  <svg class="toast-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+  代码生成完成 — index.html 已保存
+</div>
+
+<script>
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+document.querySelectorAll('.preview-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+document.querySelectorAll('.file-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.file-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+const textarea = document.querySelector('.chat-input');
+textarea.addEventListener('input', () => {
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+});
+setTimeout(() => {
+  const toast = document.querySelector('.toast');
+  if (toast) {
+    toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => toast.remove(), 300);
+  }
+}, 4000);
+</script>
+</body>
+</html>
